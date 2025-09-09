@@ -1,0 +1,408 @@
+{
+	"jobConfig": {
+		"name": "ETL Job",
+		"description": "",
+		"role": "arn:aws:iam::904548747587:role/demo-role",
+		"command": "glueetl",
+		"version": "5.0",
+		"runtime": null,
+		"workerType": "G.1X",
+		"numberOfWorkers": 10,
+		"maxCapacity": 10,
+		"jobRunQueuingEnabled": false,
+		"maxRetries": 0,
+		"timeout": 480,
+		"maxConcurrentRuns": 1,
+		"security": "none",
+		"scriptName": "ETL Job.py",
+		"scriptLocation": "s3://aws-glue-assets-904548747587-eu-north-1/scripts/",
+		"language": "python-3",
+		"spark": true,
+		"sparkConfiguration": "standard",
+		"jobParameters": [],
+		"tags": [],
+		"jobMode": "VISUAL_MODE",
+		"createdOn": "2025-09-09T09:54:31.469Z",
+		"developerMode": false,
+		"connectionsList": [],
+		"temporaryDirectory": "s3://aws-glue-assets-904548747587-eu-north-1/temporary/",
+		"glueHiveMetastore": true,
+		"etlAutoTuning": true,
+		"metrics": true,
+		"observabilityMetrics": true,
+		"bookmark": "job-bookmark-disable",
+		"sparkPath": "s3://aws-glue-assets-904548747587-eu-north-1/sparkHistoryLogs/",
+		"maintenanceWindow": null,
+		"pythonPath": "",
+		"dependentPath": "",
+		"additionalPythonModules": ""
+	},
+	"dag": {
+		"node-1757410074709": {
+			"nodeId": "node-1757410074709",
+			"dataPreview": false,
+			"previewAmount": 0,
+			"inputs": [
+				"node-1757410238906"
+			],
+			"name": "Change Schema",
+			"generatedNodeName": "ChangeSchema_node1757410074709",
+			"classification": "Transform",
+			"type": "ApplyMapping",
+			"mapping": [
+				{
+					"toKey": "customer_id",
+					"fromPath": [
+						"customer_id"
+					],
+					"toType": "string",
+					"fromType": "long",
+					"dropped": false,
+					"children": null
+				},
+				{
+					"toKey": "name",
+					"fromPath": [
+						"name"
+					],
+					"toType": "string",
+					"fromType": "string",
+					"dropped": false,
+					"children": null
+				},
+				{
+					"toKey": "city",
+					"fromPath": [
+						"city"
+					],
+					"toType": "string",
+					"fromType": "string",
+					"dropped": false,
+					"children": null
+				},
+				{
+					"toKey": "state",
+					"fromPath": [
+						"state"
+					],
+					"toType": "string",
+					"fromType": "string",
+					"dropped": false,
+					"children": null
+				},
+				{
+					"toKey": "country",
+					"fromPath": [
+						"country"
+					],
+					"toType": "string",
+					"fromType": "string",
+					"dropped": false,
+					"children": null
+				},
+				{
+					"toKey": "registration_date",
+					"fromPath": [
+						"registration_date"
+					],
+					"toType": "date",
+					"fromType": "string",
+					"dropped": false,
+					"children": null
+				},
+				{
+					"toKey": "is_active",
+					"fromPath": [
+						"is_active"
+					],
+					"toType": "string",
+					"fromType": "boolean",
+					"dropped": false,
+					"children": null
+				}
+			],
+			"parentsValid": true,
+			"calculatedType": "",
+			"codeGenVersion": 2
+		},
+		"node-1757410076221": {
+			"nodeId": "node-1757410076221",
+			"dataPreview": false,
+			"previewAmount": 0,
+			"inputs": [
+				"node-1757410638701",
+				"node-1757410910452"
+			],
+			"name": "Customer_order_Join",
+			"generatedNodeName": "Customer_order_Join_node1757410076221",
+			"classification": "Transform",
+			"type": "Join",
+			"joinType": "right",
+			"columns": [
+				{
+					"from": "node-1757410638701",
+					"keys": [
+						"customer_id"
+					]
+				},
+				{
+					"from": "node-1757410910452",
+					"keys": [
+						"right_customer_id"
+					]
+				}
+			],
+			"columnConditions": [
+				"="
+			],
+			"parentsValid": true,
+			"calculatedType": "",
+			"codeGenVersion": 2
+		},
+		"node-1757410148306": {
+			"nodeId": "node-1757410148306",
+			"dataPreview": false,
+			"previewAmount": 0,
+			"inputs": [
+				"node-1757410124564"
+			],
+			"name": "Output-data in S3",
+			"generatedNodeName": "OutputdatainS3_node1757410148306",
+			"classification": "DataSink",
+			"type": "S3",
+			"streamingBatchInterval": 100,
+			"format": "glueparquet",
+			"compression": "snappy",
+			"numberTargetPartitions": "0",
+			"path": "s3://demo-bucket-2604/output-data/",
+			"partitionKeys": [],
+			"schemaChangePolicy": {
+				"enableUpdateCatalog": true,
+				"updateBehavior": "UPDATE_IN_DATABASE",
+				"database": "demo-glue-s3-db",
+				"table": "output-table"
+			},
+			"updateCatalogOptions": "schemaAndPartitions",
+			"autoDataQuality": {
+				"isEnabled": true,
+				"evaluationContext": "EvaluateDataQuality_node1757410046155"
+			},
+			"calculatedType": "",
+			"codeGenVersion": 2
+		},
+		"node-1757410364062": {
+			"nodeId": "node-1757410364062",
+			"dataPreview": false,
+			"previewAmount": 0,
+			"inputs": [],
+			"name": "AWS Glue Data Catalog Order",
+			"generatedNodeName": "AWSGlueDataCatalogOrder_node1757410364062",
+			"classification": "DataSource",
+			"type": "Catalog",
+			"isCatalog": true,
+			"database": "demo-glue-s3-db",
+			"table": "orders_csv",
+			"partitionPredicate": "",
+			"calculatedType": "",
+			"runtimeParameters": [],
+			"codeGenVersion": 2
+		},
+		"node-1757410638701": {
+			"nodeId": "node-1757410638701",
+			"dataPreview": false,
+			"previewAmount": 0,
+			"inputs": [
+				"node-1757410364062"
+			],
+			"name": "Change Schema",
+			"generatedNodeName": "ChangeSchema_node1757410638701",
+			"classification": "Transform",
+			"type": "ApplyMapping",
+			"mapping": [
+				{
+					"toKey": "order_id",
+					"fromPath": [
+						"order_id"
+					],
+					"toType": "long",
+					"fromType": "long",
+					"dropped": false,
+					"children": null
+				},
+				{
+					"toKey": "customer_id",
+					"fromPath": [
+						"customer_id"
+					],
+					"toType": "long",
+					"fromType": "long",
+					"dropped": false,
+					"children": null
+				},
+				{
+					"toKey": "order_date",
+					"fromPath": [
+						"order_date"
+					],
+					"toType": "date",
+					"fromType": "string",
+					"dropped": false,
+					"children": null
+				},
+				{
+					"toKey": "total_amount",
+					"fromPath": [
+						"total_amount"
+					],
+					"toType": "double",
+					"fromType": "double",
+					"dropped": false,
+					"children": null
+				},
+				{
+					"toKey": "status",
+					"fromPath": [
+						"status"
+					],
+					"toType": "string",
+					"fromType": "string",
+					"dropped": false,
+					"children": null
+				}
+			],
+			"parentsValid": true,
+			"calculatedType": "",
+			"codeGenVersion": 2
+		},
+		"node-1757410238906": {
+			"nodeId": "node-1757410238906",
+			"dataPreview": false,
+			"previewAmount": 0,
+			"inputs": [],
+			"name": "AWS Glue Data Catalog Customer",
+			"generatedNodeName": "AWSGlueDataCatalogCustomer_node1757410238906",
+			"classification": "DataSource",
+			"type": "Catalog",
+			"isCatalog": true,
+			"database": "demo-glue-s3-db",
+			"table": "customers_csv",
+			"partitionPredicate": "",
+			"calculatedType": "",
+			"runtimeParameters": [],
+			"codeGenVersion": 2
+		},
+		"node-1757410124564": {
+			"nodeId": "node-1757410124564",
+			"dataPreview": false,
+			"previewAmount": 0,
+			"inputs": [
+				"node-1757410076221"
+			],
+			"name": "Customer_order_Aggregate",
+			"generatedNodeName": "Customer_order_Aggregate_node1757410124564",
+			"classification": "Transform",
+			"type": "Aggregate",
+			"parentsValid": true,
+			"calculatedType": "",
+			"groups": [
+				"customer_id"
+			],
+			"aggs": [
+				{
+					"column": "order_id",
+					"aggFunc": "count"
+				}
+			],
+			"codeGenVersion": 2
+		},
+		"node-1757410910452": {
+			"nodeId": "node-1757410910452",
+			"dataPreview": false,
+			"previewAmount": 0,
+			"inputs": [
+				"node-1757410074709"
+			],
+			"name": "Renamed keys for Customer_order_Join",
+			"generatedNodeName": "RenamedkeysforCustomer_order_Join_node1757410910452",
+			"classification": "Transform",
+			"type": "ApplyMapping",
+			"mapping": [
+				{
+					"toKey": "right_customer_id",
+					"fromPath": [
+						"customer_id"
+					],
+					"toType": "string",
+					"fromType": "string",
+					"dropped": false,
+					"children": null
+				},
+				{
+					"toKey": "right_name",
+					"fromPath": [
+						"name"
+					],
+					"toType": "string",
+					"fromType": "string",
+					"dropped": false,
+					"children": null
+				},
+				{
+					"toKey": "right_city",
+					"fromPath": [
+						"city"
+					],
+					"toType": "string",
+					"fromType": "string",
+					"dropped": false,
+					"children": null
+				},
+				{
+					"toKey": "right_state",
+					"fromPath": [
+						"state"
+					],
+					"toType": "string",
+					"fromType": "string",
+					"dropped": false,
+					"children": null
+				},
+				{
+					"toKey": "right_country",
+					"fromPath": [
+						"country"
+					],
+					"toType": "string",
+					"fromType": "string",
+					"dropped": false,
+					"children": null
+				},
+				{
+					"toKey": "right_registration_date",
+					"fromPath": [
+						"registration_date"
+					],
+					"toType": "date",
+					"fromType": "date",
+					"dropped": false,
+					"children": null
+				},
+				{
+					"toKey": "right_is_active",
+					"fromPath": [
+						"is_active"
+					],
+					"toType": "string",
+					"fromType": "string",
+					"dropped": false,
+					"children": null
+				}
+			],
+			"parentsValid": true,
+			"calculatedType": "",
+			"codeGenVersion": 2
+		}
+	},
+	"hasBeenSaved": false,
+	"usageProfileName": null
+}
